@@ -103,6 +103,7 @@ export default function IndexPage() {
   const [customHex, setCustomHex] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   const defaultStartDate = addDays(startOfWeek(now, { weekStartsOn: 0 }), 1);
   const defaultEndDate = subDays(endOfWeek(now, { weekStartsOn: 0 }), 1);
@@ -134,6 +135,7 @@ export default function IndexPage() {
 
     try {
       const formData = new FormData();
+
       formData.append("name", data.name);
       formData.append("position", data.position);
       formData.append(
@@ -176,6 +178,43 @@ export default function IndexPage() {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
+
+    if (file && file.type.startsWith("image/")) {
+      // Set file in form
+      setValue("image", file, { shouldValidate: true });
+
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setSignaturePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
 
     if (file && file.type.startsWith("image/")) {
       // Set file in form
@@ -413,8 +452,16 @@ export default function IndexPage() {
                     onChange={handleSignatureChange}
                   />
                   <label
-                    className="flex flex-col items-center justify-center w-full min-h-48 border-2 border-dashed border-default-300 rounded-lg cursor-pointer hover:border-default-400 transition-colors"
+                    className={`flex flex-col items-center justify-center w-full min-h-48 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                      isDragging
+                        ? "border-primary bg-primary/10"
+                        : "border-default-300 hover:border-default-400"
+                    }`}
                     htmlFor="signature-upload"
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
                   >
                     {signaturePreview ? (
                       <div className="relative w-full h-full p-2 grid place-items-center">
