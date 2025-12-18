@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@heroui/button";
 import { DateRangePicker } from "@heroui/date-picker";
 import { Input, Textarea } from "@heroui/input";
@@ -103,6 +103,7 @@ export default function IndexPage() {
   const [customHex, setCustomHex] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfFilename, setPdfFilename] = useState<string>("reporte.pdf");
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
   const defaultStartDate = addDays(startOfWeek(now, { weekStartsOn: 0 }), 1);
@@ -129,6 +130,47 @@ export default function IndexPage() {
 
   const selectedColor = watch("color");
 
+  // Cargar datos del localStorage al montar el componente
+  useEffect(() => {
+    const savedName = localStorage.getItem("reportName");
+    const savedPosition = localStorage.getItem("reportPosition");
+    const savedColor = localStorage.getItem("reportColor");
+    const savedSignature = localStorage.getItem("reportSignature");
+
+    if (savedName) setValue("name", savedName);
+    if (savedPosition) setValue("position", savedPosition);
+    if (savedColor) setValue("color", savedColor);
+    if (savedSignature) {
+      setSignaturePreview(savedSignature);
+      // Convertir base64 a File
+      fetch(savedSignature)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const file = new File([blob], "signature.png", {
+            type: "image/png",
+          });
+          setValue("image", file);
+        });
+    }
+  }, [setValue]);
+
+  // Guardar datos en localStorage cuando cambien
+  useEffect(() => {
+    const subscription = watch((value, { name: fieldName }) => {
+      if (fieldName === "name" && value.name) {
+        localStorage.setItem("reportName", value.name);
+      }
+      if (fieldName === "position" && value.position) {
+        localStorage.setItem("reportPosition", value.position);
+      }
+      if (fieldName === "color" && value.color) {
+        localStorage.setItem("reportColor", value.color);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     setPdfUrl(null);
@@ -137,7 +179,10 @@ export default function IndexPage() {
       const formData = new FormData();
 
       formData.append("name", data.name);
-      formData.append("position", data.position);
+      formData.append(
+        "position",
+        positions.find((p) => p.key === data.position)?.label || data.position
+      );
       formData.append(
         "start_date",
         format(data.start_date.toDate(getLocalTimeZone()), "dd-MM-yyyy")
@@ -161,10 +206,24 @@ export default function IndexPage() {
         throw new Error("Error al generar el reporte");
       }
 
+      // Extraer el nombre del archivo del header Content-Disposition
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = "reporte.pdf";
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(
+          /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+        );
+        if (filenameMatch && filenameMatch[1]) {
+          filename = decodeURIComponent(filenameMatch[1].replace(/['"]/g, ""));
+        }
+      }
+
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
 
       setPdfUrl(url);
+      setPdfFilename(filename);
     } catch (error) {
       console.error("Error:", error);
 
@@ -186,7 +245,10 @@ export default function IndexPage() {
       const reader = new FileReader();
 
       reader.onloadend = () => {
-        setSignaturePreview(reader.result as string);
+        const result = reader.result as string;
+        setSignaturePreview(result);
+        // Guardar en localStorage
+        localStorage.setItem("reportSignature", result);
       };
       reader.readAsDataURL(file);
     }
@@ -223,7 +285,10 @@ export default function IndexPage() {
       const reader = new FileReader();
 
       reader.onloadend = () => {
-        setSignaturePreview(reader.result as string);
+        const result = reader.result as string;
+        setSignaturePreview(result);
+        // Guardar en localStorage
+        localStorage.setItem("reportSignature", result);
       };
       reader.readAsDataURL(file);
     }
@@ -539,23 +604,11 @@ export default function IndexPage() {
               <Button
                 as="a"
                 color="primary"
-                download="reporte.pdf"
+                download={pdfFilename}
                 href={pdfUrl}
                 variant="flat"
               >
                 Descargar PDF
-              </Button>
-              <Button
-                color="danger"
-                variant="light"
-                onClick={() => {
-                  if (pdfUrl) {
-                    URL.revokeObjectURL(pdfUrl);
-                  }
-                  setPdfUrl(null);
-                }}
-              >
-                Cerrar
               </Button>
             </div>
           </div>
