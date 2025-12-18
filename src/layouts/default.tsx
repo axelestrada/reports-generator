@@ -1,5 +1,3 @@
-import { Link } from "@heroui/link";
-
 import { Navbar } from "@/components/navbar";
 
 export default function DefaultLayout({
@@ -14,15 +12,15 @@ export default function DefaultLayout({
         {children}
       </main>
       <footer className="w-full flex items-center justify-center py-3">
-        <Link
-          isExternal
+        <a
           className="flex items-center gap-1 text-current"
           href="https://axelestrada.github.io"
-          title="Axel Estrada homepage"
+          rel="noopener noreferrer"
+          target="_blank"
         >
           <span className="text-default-600">Made with ❤️ by</span>
           <p className="text-primary">Axel Estrada</p>
-        </Link>
+        </a>
       </footer>
     </div>
   );

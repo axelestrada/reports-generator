@@ -5,12 +5,10 @@ import {
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  NavbarMenuToggle,
 } from "@heroui/navbar";
 
-import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { GithubIcon, HeartFilledIcon } from "@/components/icons";
+import { HeartFilledIcon } from "@/components/icons";
 import { Logo } from "@/components/icons";
 
 export const Navbar = () => {
@@ -35,16 +33,19 @@ export const Navbar = () => {
       >
         <ThemeSwitch />
         <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
+          <a
             href="https://axelestrada.github.io"
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
+            rel="noopener noreferrer"
+            target="_blank"
           >
-            Axel Estrada
-          </Button>
+            <Button
+              className="text-sm font-normal text-default-600 bg-default-100"
+              startContent={<HeartFilledIcon className="text-danger" />}
+              variant="flat"
+            >
+              Axel Estrada
+            </Button>
+          </a>
         </NavbarItem>
       </NavbarContent>
 
