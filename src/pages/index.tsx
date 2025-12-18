@@ -197,7 +197,7 @@ export default function IndexPage() {
         formData.append("image", data.image);
       }
 
-      const response = await fetch("http://192.168.194.167:3200/generator", {
+      const response = await fetch("https://reports-generator-backend.onrender.com/generator", {
         method: "POST",
         body: formData,
       });
