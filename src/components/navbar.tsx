@@ -5,12 +5,10 @@ import {
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  NavbarMenuToggle,
 } from "@heroui/navbar";
 
-import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { GithubIcon, HeartFilledIcon } from "@/components/icons";
+import { HeartFilledIcon } from "@/components/icons";
 import { Logo } from "@/components/icons";
 
 export const Navbar = () => {
