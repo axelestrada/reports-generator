@@ -47,6 +47,21 @@ export const Navbar = () => {
             </Button>
           </a>
         </NavbarItem>
+        <NavbarItem className="hidden md:flex">
+          <a
+            href="https://jcastillodev.com/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <Button
+              className="text-sm font-normal text-default-600 bg-default-100"
+              startContent={<HeartFilledIcon className="text-danger" />}
+              variant="flat"
+            >
+              Junior Castillo
+            </Button>
+          </a>
+        </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">

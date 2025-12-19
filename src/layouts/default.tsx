@@ -12,15 +12,29 @@ export default function DefaultLayout({
         {children}
       </main>
       <footer className="w-full flex items-center justify-center py-3">
-        <a
-          className="flex items-center gap-1 text-current"
-          href="https://axelestrada.github.io"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <span className="text-default-600">Made with ❤️ by</span>
-          <p className="text-primary">Axel Estrada</p>
-        </a>
+        <p className="text-default-600">
+          <span>Made with ❤️ by </span>
+
+          <a
+            className="text-primary"
+            href="https://axelestrada.github.io"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Axel Estrada
+          </a>
+
+          <span> and </span>
+
+          <a
+            className="text-primary"
+            href="https://jcastillodev.com/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Junior Castillo
+          </a>
+        </p>
       </footer>
     </div>
   );
